@@ -21,50 +21,35 @@ int firstMove = 0;
 #define None 10
 #define Flag 11
 
-void initUserBoard()
-{
-	for (int i = 1; i < LENGTH - 1; i++)
-	{
-		for (int j = 1; j < WIDTH - 1; j++)
-		{
+void initUserBoard(){
+	for (int i = 1; i < LENGTH - 1; i++){
+		for (int j = 1; j < WIDTH - 1; j++){
 			user_board[i][j] = None;
 		}
 	}
 }
 
-bool isMine(int x, int y)
-{
+bool isMine(int x, int y){
 	if (board[x][y] == Bomb)
 		return true;
 	return false;
 }
 
-void initBombs(int x, int y)
-{
+void initBombs(int x, int y){
 	int cnt = BOMBS;
 
-	while (cnt-- > 0)
-	{
+	while (cnt-- > 0){
 		int a = rand() % (LENGTH-2) +1;
 		int b = rand()%(WIDTH-2)+1;
 
-		if (isMine(x, y) || (x == a && y == b))
-		{
-			cnt++;
-		}
-		else
-		{
-			board[a][b] = Bomb;
-		}
+		if (isMine(x, y) || (x == a && y == b)) cnt++;
+		else board[a][b] = Bomb;
 	}
 }
 
-void getMineNumber()
-{
-	for (int a = 1; a < LENGTH - 1; a++)
-	{
-		for (int b = 1; b < WIDTH - 1; b++)
-		{
+void getMineNumber(){
+	for (int a = 1; a < LENGTH - 1; a++){
+		for (int b = 1; b < WIDTH - 1; b++){
 			int count = 0;
 
 			if (isMine(a, b)) continue;
@@ -81,40 +66,30 @@ void getMineNumber()
 		}
 	}
 
-	for (int a = 1; a < LENGTH - 1; a++)
-	{
-		for (int b = 1; b < WIDTH - 1; b++)
-		{
+	for (int a = 1; a < LENGTH - 1; a++){
+		for (int b = 1; b < WIDTH - 1; b++){
 			cout << board[b][a] << " ";
 		}
 		cout << endl;
 	}
 }
 
-void openAround(int a, int b)
-{
+void openAround(int a, int b){
 	int cnt = 0;
-	for (int i = -1; i <= 1; i++)
-	{
-		for (int j = -1; j <= 1; j++)
-		{
-			if (user_board[a + i][b + j] != None)
-			{
-				continue;
-			}
+	for (int i = -1; i <= 1; i++){
+		for (int j = -1; j <= 1; j++){
+			if (user_board[a + i][b + j] != None) continue;
+			
 			user_board[a + i][b + j] = board[a + i][b + j];
 
-			if (board[a + i][b + j] == 0)
-			{
+			if (board[a + i][b + j] == 0) 
 				openAround(a + i, b + j);
-			}
 		}
 	}
 }
 
 
-int main()
-{
+int main(){
 	RenderWindow app(VideoMode(600, 600), "Minesweeper");
 
 	Texture t;
@@ -129,8 +104,7 @@ int main()
 
 	initUserBoard();
 
-	while (app.isOpen())
-	{
+	while (app.isOpen()){
 		Vector2i pos = Mouse::getPosition(app);
 
 		int x = pos.x / w;
@@ -138,47 +112,32 @@ int main()
 
 		Event e;
 
-		while (app.pollEvent(e))
-		{
+		while (app.pollEvent(e)){
 			if (e.type == Event::Closed)
 				app.close();
 
-			if (e.type == Event::MouseButtonPressed)
-			{
-				if (e.key.code == Mouse::Left)
-				{
-					if (firstMove == 0)
-					{
+			if (e.type == Event::MouseButtonPressed){
+				if (e.key.code == Mouse::Left){
+					if (firstMove == 0){
 						initBombs(x, y);
 						getMineNumber();
 						user_board[x][y] = board[x][y];
 						firstMove = 1;
 					}
-					else if (board[x][y] == Bomb)
-					{
-						finish = 1;
-					}
-					else
-					{
-						user_board[x][y] = board[x][y];
-					}
+					else if (board[x][y] == Bomb) finish = 1;
+					else user_board[x][y] = board[x][y];
 
 					if (board[x][y] == 0)
-					{
 						openAround(x, y);
-					}
 				}
-				else if (e.key.code == Mouse::Right)
-				{
-					if (user_board[x][y] == Flag)
-					{
+				else if (e.key.code == Mouse::Right){
+					if (user_board[x][y] == Flag){
 						user_board[x][y] = None;
 						if (board[x][y] == Bomb)
 							foundedBombs--;
 
 					}
-					else if (user_board[x][y] == None)
-					{
+					else if (user_board[x][y] == None){
 						user_board[x][y] = Flag;
 						if (board[x][y] == Bomb)
 							foundedBombs++;
@@ -189,20 +148,15 @@ int main()
 
 		app.clear(Color::White);
 
-		if (foundedBombs == BOMBS)
-		{
+		if (foundedBombs == BOMBS){
 			win.setPosition(120, 110);
 			app.draw(win);
 			app.display();
 		}
-		else
-		{
-			for (int i = 1; i < LENGTH - 1; i++)
-			{
-				for (int j = 1; j<WIDTH - 1; j++)
-				{
-					if (finish == 1)
-					{
+		else{
+			for (int i = 1; i < LENGTH - 1; i++){
+				for (int j = 1; j<WIDTH - 1; j++){
+					if (finish == 1){
 						user_board[i][j] = board[i][j];
 					}
 					s.setTextureRect(IntRect(user_board[i][j] * w, 0, w, w));
